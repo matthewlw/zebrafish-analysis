@@ -33,7 +33,7 @@ if __name__ == '__main__':
     mean_image = skimage.exposure.rescale_intensity(I.mean(axis=0))
     cropped = crop_circle(mean_image, radius_adjust=-20)
     background = erase_zebrafish(cropped)
-    I -= background
-    I_scaled = map_np(skimage.exposure.rescale_intensity, I)
+    I_adjusted = I - background
+    I_scaled = map_np(skimage.exposure.rescale_intensity, I_adjusted)
     for i in range(len(I_scaled)):
         skimage.io.imsave('erased-{:03d}.png'.format(i), I_scaled[i])
