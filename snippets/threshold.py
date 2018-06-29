@@ -74,16 +74,14 @@ def get_multi_threshold(img, nThr, **kwargs):
     nMaxIter = kwargs.get('nMaxIter', 100)
     minThr = kwargs.get('minThr', 0)
 
-    thr = np.zeros((nThr, 1))
+    thr = np.zeros(nThr)
     imgDims = img.shape
-    nPxls = np.product(imgDims) / 2 # this is the split
+    nPxls = np.product(imgDims) # this is the split
     img_quant = np.zeros(imgDims)
     for jj in range(nThr):
         # print(f"Getting threshold #{jj}")
         thr0 = threshold_otsu(img)
         thr[jj] = getGlobalThr(img, tol, nMaxIter, thr0)
-        # Possibly greater than or equal to; I don't have the Matlab to know
-        # for sure. Fortunately, it is unlikely to change much.
         (one_rs, one_cs) = (img > thr[jj]).nonzero()
         if (0 < len(one_rs) < nPxls) and thr[jj] > minThr:
             img_quant[one_rs, one_cs] = nThr - jj + 1

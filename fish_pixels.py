@@ -46,7 +46,9 @@ def find_fish_pixels_for_midline_tracking(I, headDiam=1, pxlLen=0.05):
     multi_thr_out = map_np(lambda img: get_multi_threshold(img, 3), I_smooth)
     thr = map_np(lambda tup: tup[0], multi_thr_out)
     img_quant = map_np(lambda tup: tup[1], multi_thr_out)
-    I_fish = (I >= img_quant)
+    print('thr shape: {}'.format(thr.shape))
+    print('img_quant shape: {}'.format(img_quant.shape))
+    I_fish = np.array(list(map(lambda a, b: a >= b, I, thr[:, 1])))
     fp = (np.ceil(I.shape[1] / 2), np.ceil(I.shape[2]) / 2)
     imgInds = range(I.shape[0])
     nFishPxls = np.zeros(I.shape[0])
@@ -95,7 +97,7 @@ def find_fish_pixels_for_midline_tracking(I, headDiam=1, pxlLen=0.05):
             print(f'Correcting {len(overInds)} with excess fish pxls...')
         itermax = 100
         for jj in overInds:
-            thr_new = img_quant
+            thr_new = thr[jj, 1]
             wt = 0.5
             count = 0
             foo = I_smooth[jj]
@@ -107,7 +109,7 @@ def find_fish_pixels_for_midline_tracking(I, headDiam=1, pxlLen=0.05):
                 count += 1
                 T.append(thr_new)
                 N.append(nFishPxls[jj])
-                thr_new = wt * thr + (1 - wt) * img_quant
+                thr_new = wt * thr[jj, 0] + (1 - wt) * thr[jj, 2]
                 blah = (foo >= thr_new)
                 nFishPxls[jj] = blah.sum()
                 n_now = np.abs(nFishPxls[jj] - mu)
@@ -149,7 +151,7 @@ def find_fish_pixels_for_midline_tracking(I, headDiam=1, pxlLen=0.05):
         else:
             print(f'Correcting {len(underInds)} with too few fish pxls...')
         for jj in underInds:
-            thr_new = img_quant
+            thr_new = thr[jj, 1]
             wt = 0.5
             count = 0
             foo = I_smooth[jj]
@@ -167,7 +169,7 @@ def find_fish_pixels_for_midline_tracking(I, headDiam=1, pxlLen=0.05):
                 count += 1
                 T.append(thr_new)
                 N.append(nFishPxls[jj])
-                thr_new = wt * img_quant + (1 - wt) * 0
+                thr_new = wt * thr[jj, 1] + (1 - wt) * 0
                 blah = (foo >= thr_new)
                 nFishPxls[jj] = blah.sum()
                 n_now = np.abs(nFishPxls[jj] - mu)
