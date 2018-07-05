@@ -26,6 +26,31 @@ def get_circle_coords(image, radius_adjust=0, low=300, high=500):
     return (crr, ccc)
 
 def crop_circle(image, radius_adjust=0, low=300, high=500):
+    """
+    Zero out all the pixels outside of the dish.
+
+    This method uses a Hough transform to automatically detect the location
+    and radius of the circle, though it needs bounds to speed up computation.
+
+    Parameters
+    ----------
+    image : ndarray image
+        The original camera image
+    radius_adjust : int
+        How much to adjust the radius of the circle. Use this to, for instance,
+        delete additional space just within the boundaries of the dish to remove
+        artifacts
+    low : int
+        A lower bound on the radius of the circle, in pixels
+    high : int
+        An upper bound on the radius of the circle, in pixels
+
+    Returns
+    -------
+    new_image : ndarray image
+        A copy of the whole-dish image, with the pixels outside the circle
+        set to zero.
+    """
     (cx, cy, radius) = get_circle_params(image, radius_adjust, low, high)
     crr, ccc = skimage.draw.circle(cy, cx, radius + radius_adjust, image.shape)
     new_image = np.zeros_like(image)
