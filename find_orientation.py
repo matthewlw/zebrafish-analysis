@@ -44,3 +44,24 @@ def weighted_centroid_image(image):
     ys, xs = (image != np.nan).nonzero()
     ws = image[ys, xs]
     return weighted_centroid(xs, ys, ws)
+
+def orientation_moments(blob):
+    μ_ji = blob.weighted_moments_central
+    cov = np.array([
+        [μ_ji[2, 0], μ_ji[1, 1]],
+        [μ_ji[1, 1], μ_ji[0, 2]]
+    ]) / μ_ji[0, 0]
+
+    μp_20 = μ_ji[2, 0] / μ_ji[0, 0]
+    μp_02 = μ_ji[0, 2] / μ_ji[0, 0]
+    μp_11 = μ_ji[1, 1] / μ_ji[0, 0]
+
+    expr = (2 * μp_11) / (μp_20 - μp_02)
+    θ_my = 0.5 * np.arctan(expr)
+
+    if θ_my != θ_my:
+        return np.pi / 4
+    if (2 * μp_11) < 0:
+        return ((-θ_my) % (np.pi / 2))
+    else:
+        return ((-θ_my) % (np.pi / 2)) - (np.pi / 2)
