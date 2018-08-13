@@ -11,7 +11,7 @@ from patches import make_patches
 from scipy.ndimage import binary_fill_holes
 from sklearn.ensemble import RandomForestClassifier
 
-from typing import Dict, Tuple, Set
+from typing import Dict, Tuple, Set, List
 Coordinate = Tuple[np.int32, np.int32]
 
 def roi_to_coords(roi):
